@@ -4,24 +4,36 @@
 int main()
 {
     int *p = NULL;
-    int n;
+    int count;
 
-    printf("Enter the no.of bytes to allocate: ");
-    scanf("%d", &n);
+    /* Ask for number of integers to allocate (clearer and less error-prone than raw bytes) */
+    printf("Enter the number of ints to allocate: ");
+    if (scanf("%d", &count) != 1 || count <= 0)
+    {
+        fprintf(stderr, "Invalid input. Please enter a positive integer.\n");
+        return 1;
+    }
 
-    printf("THE VALUE OF P BEFORE ALLOCATION = %d &p = %p\n", *p, &p);
+    /* Do not dereference p before allocation; it's NULL now. Print pointer safely. */
+    printf("Pointer p before allocation = %p, &p = %p\n", (void *)p, (void *)&p);
 
-    p = malloc(n);
-
+    /* Allocate enough bytes for 'count' ints */
+    p = malloc((size_t)count * sizeof *p);
     if (p == NULL)
     {
-        printf("Memory allocation failed\n");
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
     }
-    else
-    {
-        printf("Memory allocation successful\n");
-        printf("THE VALUE OF P AFTER ALLOCATION = %d &p = %p\n", *p, &p);
-    }
+
+    printf("Memory allocation successful: p = %p\n", (void *)p);
+
+    /* Initialize allocated memory to avoid reading uninitialized values */
+    for (int i = 0; i < count; i++)
+        p[i] = 0;
+
+    /* Safe to dereference now */
+    printf("p[0] = %d\n", p[0]);
+
     free(p);
     return 0;
 }
